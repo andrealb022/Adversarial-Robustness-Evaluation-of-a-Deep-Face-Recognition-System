@@ -1,0 +1,3 @@
+Download the NN2 network weights file named senet50_ft_weight.pkl to analyze the transferability of the attacks. You can replace the network with another one if you prefer.
+You can find the pretrained models and code in the official repository here:
+https://github.com/cydonia999/VGGFace2-pytorch
