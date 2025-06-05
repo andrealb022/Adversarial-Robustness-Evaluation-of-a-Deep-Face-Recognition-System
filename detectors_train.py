@@ -10,41 +10,45 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    # Crezione della directory in cui salvare i modelli dei detectors:
+    # Create directory to save detector models
     os.makedirs("./models", exist_ok=True)
     
-    # Lettura del train set (clean) dei detectors:
+    # Load the clean training set for detectors
     train_images_clean = get_train_set().get_images()
 
     attack_types = ["fgsm", "bim", "pgd", "df", "cw"]
 
-    # Addestramento dei detectors (uno per ogni attacco):
+    # Train one detector for each attack
     for attack_type in attack_types:
         print(f"Training detector for attack: {attack_type}")
 
-        # Creazione di un'istanza della classe BinaryInputDetector della libreria ART:
+        # Create an instance of ART's BinaryInputDetector
         detector_classifier = setup_detector_classifier(device)
         detector = BinaryInputDetector(detector_classifier)
         
-        # Lettura del train set (adversarial) dei detectors:
+        # Load adversarial training set for the current attack
         training_set_path = os.path.join("./dataset/detectors_train_set/adversarial_examples/", attack_type)
         train_images_adv = load_images_from_npy(training_set_path)
         train_images_adv = np.concatenate(train_images_adv, axis=0)
         
-        # Concatenazione delle immagini clean e adversarial:
+        # Concatenate clean and adversarial images
         x_train_detector = np.concatenate((train_images_clean, train_images_adv), axis=0)
 
-        # Creazione delle etichette per il training set ([1, 0] per immagini clean e [0, 1] per immagini adversarial):
-        y_train_detector = np.concatenate((np.array([[1, 0]] * train_images_clean.shape[0]), np.array([[0, 1]] * np.shape(train_images_adv)[0])), axis=0)
+        # Create training labels ([1, 0] for clean, [0, 1] for adversarial)
+        y_train_detector = np.concatenate(
+            (np.array([[1, 0]] * train_images_clean.shape[0]), 
+             np.array([[0, 1]] * train_images_adv.shape[0])),
+            axis=0
+        )
 
-        # Addestramento del detector:
+        # Train the detector
         detector.fit(x_train_detector, y_train_detector, nb_epochs=30, batch_size=16, verbose=True)
         
-        # Salvataggio del modello del detector addestrato:
+        # Save the trained detector model
         model_path = os.path.join("./models", f"{attack_type}_detector.pth")
         detector_classifier.model.eval()
         torch.save(detector_classifier.model.state_dict(), model_path)
-        print(f"Detector salvato in: {model_path}.")
+        print(f"Detector saved at: {model_path}.")
 
 if __name__ == "__main__":
     main()

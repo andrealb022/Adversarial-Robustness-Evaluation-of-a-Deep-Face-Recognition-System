@@ -199,21 +199,21 @@ def load_state_dict(model, fname):
 
 #################################################################################################################################################
 
-NUM_CLASSES = 8631  # numero di classi nel dataset VGGFace2
+NUM_CLASSES = 8631  # number of classes of the dataset VGGFace2
 
-### RETE NN1 ###
+### NN1 NET ###
 
-# Funzione per caricare il modello InceptionResnetV1 (NN1)
-def get_NN1(device="cpu"):
+# Function to load the InceptionResnetV1 model (NN1)
+def load_NN1(device="cpu"):
     model = InceptionResnetV1(pretrained='vggface2').eval()
     model.to(device)
     model.classify = True
-    print("Modello NN1 caricato correttamente.")
+    print("NN1 model loaded successfully.")
     return model
 
-# Setup del classificatore NN1
+# Setup the NN1 classifier
 def setup_NN1_classifier(device):
-    NN1 = get_NN1(device) # modello
+    NN1 = load_NN1(device)
     NN1_classifier = PyTorchClassifier(
         model=NN1,
         loss=torch.nn.CrossEntropyLoss(),
@@ -227,20 +227,20 @@ def setup_NN1_classifier(device):
     return NN1_classifier
 
 
-### RETE NN2 ###
+### NN2 NETWORK ###
 
-# Funzione per caricare il modello SENet (NN2)
-def get_NN2(device="cpu", model_path='./models/senet50_ft_weight.pkl'):
+# Function to load the SENet model (NN2)
+def load_NN2(device="cpu", model_path='./models/senet50_ft_weight.pkl'):
     model = senet50(num_classes=NUM_CLASSES, include_top=True)
     load_state_dict(model, model_path)
     model.to(device)
     model.eval()
-    print("Modello NN2 caricato correttamente.")
+    print("NN2 model loaded successfully.")
     return model
 
-# Setup del classificatore NN2
+# Setup the NN2 classifier
 def setup_NN2_classifier(device):
-    NN2 = get_NN2(device) # modello
+    NN2 = load_NN2(device)
     NN2_classifier = PyTorchClassifier(
         model=NN2,
         loss=torch.nn.CrossEntropyLoss(),
@@ -253,9 +253,9 @@ def setup_NN2_classifier(device):
     return NN2_classifier
 
 
-### RETE DETECTORS ###
+### DETECTOR NETWORK ###
 
-# Rete dei detectors usati per classificare le immagini come clean o adversarial
+# Detector network used to classify images as clean or adversarial
 class AdversarialDetector(nn.Module):
     def __init__(self, backbone):
         super().__init__()
@@ -264,33 +264,33 @@ class AdversarialDetector(nn.Module):
             nn.Flatten(),
             nn.Linear(512, 256),
             nn.ReLU(),
-            nn.Linear(256, 2) # output: [clean, adversarial]
+            nn.Linear(256, 2)  # output: [clean, adversarial]
         )
 
     def forward(self, x):
         feats = self.backbone(x)
         return self.classifier(feats)
-    
-# Funzione che crea e restituisce un detector
-def get_detector(device="cpu"):
-    backbone = InceptionResnetV1(classify=False) # i detectors utilizzano InceptionResnetV1 come backbone
+
+# Function to create and return a detector model
+def load_detector(device="cpu"):
+    backbone = InceptionResnetV1(classify=False)  # detectors use InceptionResnetV1 as backbone
     for param in backbone.parameters():
-        param.requires_grad = True # rende tutti i parametri della backbone addestrabili
+        param.requires_grad = True  # make all backbone parameters trainable
     detector = AdversarialDetector(backbone)
     detector.to(device)
     return detector
 
-# Setup del classificatore del detector
+# Setup the classifier used for training the detector
 def setup_detector_classifier(device):
-    detector = get_detector(device)
+    detector = load_detector(device)
     classifier = PyTorchClassifier(
         model=detector,
         loss=torch.nn.CrossEntropyLoss(),
-        optimizer = torch.optim.Adam(detector.parameters(), lr=1e-4),
+        optimizer=torch.optim.Adam(detector.parameters(), lr=1e-4),
         input_shape=(3, 224, 224),
         channels_first=True,
         nb_classes=2,
-        clip_values=(-1.0, 1.0), # accetta valori compresi tra -1.0 e 1.0
+        clip_values=(-1.0, 1.0),  # input values range from -1.0 to 1.0
         device_type="gpu" if torch.cuda.is_available() else "cpu"
     )
     return classifier
