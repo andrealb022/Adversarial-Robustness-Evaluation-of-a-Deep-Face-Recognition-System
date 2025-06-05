@@ -3,25 +3,24 @@ Evaluated the robustness of a deep face recognition model (InceptionResNetV1) ag
 
 Project Structure
 -----------------
-.
-├── attacks/                  # Contains adversarial attack implementations using ART (FGSM, BIM, PGD, DeepFool, CarliniWagner)
-├── detectors_test.py         # Script to test adversarial detectors on each of the five attacks
-├── detectors_train_set.py    # Script to generate a training set for the detectors using the VGGFace2 dataset
-├── detectors_train.py        # Script to train detectors for each attack. Outputs 5 models saved in the `models/` directory
-├── nets.py                   # Defines all neural networks used:
-│   ├── NN1: InceptionResnetV1 from FaceNet
-│   └── NN2: SEnet50 pretrained on VGGFace2
-├── security_evaluation_curve.py  # Generates adversarial test sets and security evaluation curves for each attack.
-│                               # The resulting plots are saved under `plots/security_evaluation_curve/`
-├── test_set.py               # Randomly samples a smaller subset from VGGFace2 for faster testing and analysis
-├── utils.py                  # Utility functions for loading images, saving data, plotting curves, etc.
-├── dataset/
-│   ├── vggface2_train/train/ # ⚠️ You must manually download and place the VGGFace2 dataset here
-│   └── test_set/
-│       ├── clean/
-│       └── adversarial_examples/
-├── models/                   # Trained detectors and NN2 weights go here (see below)
-└── plots/                    # Stores accuracy and detector performance plots
+- attacks/                  # Contains adversarial attack implementations using ART (FGSM, BIM, PGD, DeepFool, CarliniWagner)
+- detectors_test.py         # Script to test adversarial detectors on each of the five attacks
+- detectors_train_set.py    # Script to generate a training set for the detectors using the VGGFace2 dataset
+- detectors_train.py        # Script to train detectors for each attack. Outputs 5 models saved in the `models/` directory
+- nets.py                   # Defines all neural networks used:
+   - NN1: InceptionResnetV1 from FaceNet
+   - NN2: SEnet50 pretrained on VGGFace2
+- security_evaluation_curve.py  # Generates adversarial test sets and security evaluation curves for each attack.
+-                               # The resulting plots are saved under `plots/security_evaluation_curve/`
+- test_set.py               # Randomly samples a smaller subset from VGGFace2 for faster testing and analysis
+- utils.py                  # Utility functions for loading images, saving data, plotting curves, etc.
+- dataset/
+-   - vggface2_train/train/ # ⚠️ You must manually download and place the VGGFace2 dataset here
+-   - test_set/
+-       - clean/
+-       - adversarial_examples/
+- models/                   # Trained detectors and NN2 weights go here (see below)
+- plots/                    # Stores accuracy and detector performance plots
 
 
 Dependencies
