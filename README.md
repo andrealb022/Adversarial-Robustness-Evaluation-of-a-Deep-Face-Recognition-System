@@ -11,14 +11,14 @@ Project Structure
    - NN1: InceptionResnetV1 from FaceNet
    - NN2: SEnet50 pretrained on VGGFace2
 - security_evaluation_curve.py  # Generates adversarial test sets and security evaluation curves for each attack.
--                               # The resulting plots are saved under `plots/security_evaluation_curve/`
+  - # The resulting plots are saved under `plots/security_evaluation_curve/`
 - test_set.py               # Randomly samples a smaller subset from VGGFace2 for faster testing and analysis
 - utils.py                  # Utility functions for loading images, saving data, plotting curves, etc.
 - dataset/
--   - vggface2_train/train/ # ⚠️ You must manually download and place the VGGFace2 dataset here
--   - test_set/
--       - clean/
--       - adversarial_examples/
+   - vggface2_train/train/ # ⚠️ You must manually download and place the VGGFace2 dataset here
+   - test_set/
+       - clean/
+       - adversarial_examples/
 - models/                   # Trained detectors and NN2 weights go here (see below)
 - plots/                    # Stores accuracy and detector performance plots
 
